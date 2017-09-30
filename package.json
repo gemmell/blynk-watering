@@ -1,0 +1,15 @@
+{
+  "name": "watering",
+  "version": "1.0.0",
+  "description": "",
+  "main": "blynk.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPL",
+  "dependencies": {
+    "blynk-library": "^0.4.7",
+    "onoff": "^1.1.7"
+  }
+}
