@@ -10,6 +10,8 @@
   "license": "GPL",
   "dependencies": {
     "blynk-library": "^0.4.7",
+    "dotenv": "^4.0.0",
+    "later": "^1.2.0",
     "onoff": "^1.1.7"
   }
 }
