@@ -43,6 +43,7 @@ export class Controller {
             let allOff = true;
             for (let i = 0; i < this.zones.length; i++) {
                 if (this.zones[i].isOn === true) {
+                    console.log(this.zones[i].name + " is still on");
                     allOff = false;
                 }
             }
@@ -67,6 +68,7 @@ export class Controller {
 
      stop(zone: number) {
        this.turnOffMainsIfLastZone();
+       console.log("Stopped " + this.zones[zone].name + ".");
        this.blynk.notify("Stopped " + this.zones[zone].name + ".");
        this.setSchedule(zone, this.zones[zone].wateringSchedule);
      }

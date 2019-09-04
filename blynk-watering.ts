@@ -23,8 +23,10 @@ zoneSelector.on('write', function (param) {
 
 goButton.on('write', function (param) {
    if ((param[0] == 1) && (controller.zones[currentZoneIdx].isOn === false)) {
+      console.log("Write: Turning on " + controller.zones[currentZoneIdx].name);
       controller.start(currentZoneIdx, customTimeInMinutes);
    } else if (controller.zones[currentZoneIdx].isOn === true) {
+      console.log("Write: Turning off " + controller.zones[currentZoneIdx].name);
       controller.stop(currentZoneIdx);
    }
 });
