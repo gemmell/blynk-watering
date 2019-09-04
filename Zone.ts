@@ -5,7 +5,7 @@ import {WateringSchedule} from './Controller'
 export class Zone {
     id: number;
     name: string;
-    pin: number;
+    ledPin: any;
     gpio: Gpio;
     isOn: boolean;
     wateringSchedule: WateringSchedule;
@@ -17,19 +17,19 @@ export class Zone {
     {
        this.blynk = blynk;
        this.name = name;
-       this.pin = pin;
+       this.ledPin = new blynk.VirtualPin(pin);
        this.gpio = new Gpio(pin, 'out');
        this.gpio.writeSync(1);
        this.isOn = false;
        this.pulseWater = pulseWater;
        this.wateringSchedule = wateringSchedule;
-       this.blynk.virtualWrite(this.pin, 0); //Turn off the led.
+       this.ledPin.virtualWrite(0); //Turn off the led.
     }
  
     get toJson() {
        return {
           name: this.name,
-          pin: this.pin,
+          pin: this.ledPin.pin,
           pulseWater: this.pulseWater,
           wateringSchedule: this.wateringSchedule
        };
@@ -40,17 +40,15 @@ export class Zone {
     }
  
     start() {
-       console.log("Start: Writing to pin: " + this.pin);
-       this.blynk.virtualWrite(this.pin, 255); //turn on the blnyk led
+       this.ledPin.virtualWrite(255); //turn on the blynk led
        this.isOn = true;      
        this.gpio.writeSync(0);
     }
  
     stop() {
-      console.log("Stop: Writing to pin: " + this.pin);
        this.gpio.writeSync(1);
        //Turn off the blynk leds
-       this.blynk.virtualWrite(this.pin, 0); 
+       this.ledPin.virtualWrite(0);
        this.isOn = false;
     }
  }
