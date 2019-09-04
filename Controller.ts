@@ -86,29 +86,26 @@ export class Controller {
             case WateringSchedule.weekly:
                 scheduleString = "at " + startTime + "am every Mon of the year"; break;
             default:
-                if (this.zones[zone].nextOccurence) {
-                    this.zones[zone].nextOccurence.clear();
-                }
-                console.log(this.zones[zone].name + " is never going to water...");
+                scheduleString = null;
         };
         this.setScheduleWithText(zone, scheduleString);
     }
 
     setScheduleWithText(zone: number, scheduleString: string) {
         this.zones[zone].scheduleText = scheduleString;
-        console.log("Using schedule text: " + scheduleString);
-        const s = later.parse.text(scheduleString);
-
         if (this.zones[zone].nextOccurence) {
-           this.zones[zone].nextOccurence.clear();
+            this.zones[zone].nextOccurence.clear();
         }
-
-        let startFn = () => {
-            this.start(60, zone);
-        };
-        this.zones[zone].nextOccurence = later.setTimeout(startFn, s);
-        let occurrences = later.schedule(s).next(1);
-        this.blynk.notify(this.zones[zone].name + " next scheduled on " + occurrences + " for 60 minutes");
+        if (scheduleString) {
+            console.log("Using schedule text: " + scheduleString);
+            const s = later.parse.text(scheduleString);
+            let startFn = () => {
+                this.start(60, zone);
+            };
+            this.zones[zone].nextOccurence = later.setTimeout(startFn, s);
+            let occurrences = later.schedule(s).next(1);
+            this.blynk.notify(this.zones[zone].name + " next scheduled on " + occurrences + " for 60 minutes");
+        }
 
     }
 }
