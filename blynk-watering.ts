@@ -2,7 +2,7 @@ import {Controller, WateringSchedule} from "./Controller"
 
 import * as BlynkLib from 'blynk-library'
 const AUTH = process.env.BLYNK_WATERING_KEY;
-const blynk = new BlynkLib.Blynk(AUTH);
+const blynk = new BlynkLib.Blynk(AUTH, {port: 443});
 
 const goButton = new blynk.VirtualPin(10);
 const timeInMinutesSlider = new blynk.VirtualPin(11);
