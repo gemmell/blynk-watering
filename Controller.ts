@@ -96,12 +96,17 @@ export class Controller {
 
     setScheduleWithText(zone: number, scheduleString: string) {
         this.zones[zone].scheduleText = scheduleString;
+        console.log("Using schedule text: " + scheduleString);
         const s = later.parse.text(scheduleString);
+
+        if (this.zones[zone].nextOccurence) {
+           this.zones[zone].nextOccurence.clear();
+        }
 
         let startFn = () => {
             this.start(60, zone);
         };
-        this.zones[zone].nextOccurence = later.setInterval(startFn, s);
+        this.zones[zone].nextOccurence = later.setTimeout(startFn, s);
         let occurrences = later.schedule(s).next(1);
         this.blynk.notify(this.zones[zone].name + " next scheduled on " + occurrences + " for 60 minutes");
 
