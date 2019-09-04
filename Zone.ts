@@ -1,6 +1,6 @@
 import {Gpio} from 'onoff';
 import * as BlynkLib from 'blynk-library'
-
+import {WateringSchedule} from './Controller'
 
 export class Zone {
     id: number;
@@ -8,12 +8,12 @@ export class Zone {
     pin: number;
     gpio: Gpio;
     isOn: boolean;
-    scheduleText: string;
+    wateringSchedule: WateringSchedule;
     pulseWater: boolean;
     nextOccurence: later.Timer;
     blynk: any;
 
-    constructor(blynk: any, name: string, pin: number, pulseWater?: boolean, scheduleText?: string)
+    constructor(blynk: any, name: string, pin: number, pulseWater?: boolean, wateringSchedule?: WateringSchedule)
     {
        this.blynk = blynk;
        this.name = name;
@@ -22,7 +22,7 @@ export class Zone {
        this.gpio.writeSync(1);
        this.isOn = false;
        this.pulseWater = pulseWater;
-       this.scheduleText = scheduleText;
+       this.wateringSchedule = wateringSchedule;
        this.blynk.virtualWrite(this.pin, 0); //Turn off the led.
     }
  
@@ -31,12 +31,12 @@ export class Zone {
           name: this.name,
           pin: this.pin,
           pulseWater: this.pulseWater,
-          scheduleText: this.scheduleText
+          wateringSchedule: this.wateringSchedule
        };
     }
  
     static fromJson(json) {
-       return new Zone(json.name, json.pin, json.pulseWater, json.scheduleText);
+       return new Zone(json.name, json.pin, json.pulseWater, json.wateringSchedule);
     }
  
     start() {

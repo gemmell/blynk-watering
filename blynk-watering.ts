@@ -15,9 +15,10 @@ let currentZoneIdx = 0;
 let customTimeInMinutes = 40;
 
 zoneSelector.on('write', function (param) {
-  console.log(param[0]);
   currentZoneIdx = Number(param) - 1;
   console.log("Set to zone: " + controller.zones[currentZoneIdx].name);
+  // Sync our schedule with the UI
+  scheduleWidget.write(controller.zones[currentZoneIdx].wateringSchedule);
 });
 
 goButton.on('write', function (param) {
@@ -34,7 +35,6 @@ timeInMinutesSlider.on('write', function (param) {
 });
 
 scheduleWidget.on('write', function (params) {
-   console.log(params[0]);
    const schd: WateringSchedule = Number(params[0]);
    controller.setSchedule(currentZoneIdx, schd);
 });

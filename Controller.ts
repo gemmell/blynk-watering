@@ -54,7 +54,7 @@ export class Controller {
         }
     }
 
-    start(timeInMinutes: number, zone: number) {
+    start(zone: number, timeInMinutes: number) {
         this.mains.start();
         this.zones[zone].start();
         let timeInMilliSeconds = timeInMinutes * 60 * 1000;
@@ -68,33 +68,37 @@ export class Controller {
      stop(zone: number) {
        this.turnOffMainsIfLastZone();
        this.blynk.notify("Stopped " + this.zones[zone].name + ".");
-       this.setScheduleWithText(zone, this.zones[zone].scheduleText);
+       this.setSchedule(zone, this.zones[zone].wateringSchedule);
      }
 
     setSchedule(zone: number, desiredSchedule: WateringSchedule)
     {
-        // Latest start is 7am, so based on the zone we want to offset them by an hour
-        const startTime: number = 7 - zone;
-        let scheduleString: string = "";
-        switch (desiredSchedule) {
-            case WateringSchedule.everySecondDay:
-                scheduleString = "at " + startTime + ":00 am every 2nd day"; break;
-            case WateringSchedule.everyThirdDay:
-                scheduleString = "at " + startTime + ":00 am every 3rd day"; break;
-            case WateringSchedule.daily:
-                scheduleString = "at " + startTime + ":00 am"; break;
-            case WateringSchedule.weekly:
-                scheduleString = "at " + startTime + ":00 am on Mon"; break;
-            default:
-                scheduleString = null;
-        };
-        this.setScheduleWithText(zone, scheduleString);
+        const thisZone = this.zones[zone];
+        if (thisZone.wateringSchedule !== desiredSchedule) {
+            thisZone.wateringSchedule = desiredSchedule;
+            // Latest start is 7am, so based on the zone we want to offset them by an hour
+            const startTime: number = 7 - zone;
+            let scheduleString: string = "";
+            switch (desiredSchedule) {
+                case WateringSchedule.everySecondDay:
+                    scheduleString = "at " + startTime + ":00 am every 2nd day"; break;
+                case WateringSchedule.everyThirdDay:
+                    scheduleString = "at " + startTime + ":00 am every 3rd day"; break;
+                case WateringSchedule.daily:
+                    scheduleString = "at " + startTime + ":00 am"; break;
+                case WateringSchedule.weekly:
+                    scheduleString = "at " + startTime + ":00 am on Mon"; break;
+                default:
+                    scheduleString = null;
+            };
+            this.setScheduleWithText(zone, scheduleString);
+        }
     }
 
     setScheduleWithText(zone: number, scheduleString: string) {
-        this.zones[zone].scheduleText = scheduleString;
-        if (this.zones[zone].nextOccurence) {
-            this.zones[zone].nextOccurence.clear();
+        const thisZone = this.zones[zone];
+        if (thisZone.nextOccurence) {
+            thisZone.nextOccurence.clear();
         }
         if (scheduleString) {
             console.log("Using schedule text: " + scheduleString);
@@ -107,6 +111,5 @@ export class Controller {
             this.blynk.notify(this.zones[zone].name + " next scheduled on " + occurrences + " for 60 minutes");
             this.zones[zone].nextOccurence = later.setInterval(startFn, s);
         }
-
     }
 }
