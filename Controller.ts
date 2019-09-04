@@ -49,8 +49,7 @@ export class Controller {
             }
             if (allOff === true) {
                 console.log("Turning mains off");
-                this.mains.gpio.writeSync(1);
-                this.blynk.virtualWrite(this.mains.pin, 0);
+                this.mains.stop();
             }
         }
     }
@@ -67,6 +66,7 @@ export class Controller {
      }
 
      stop(zone: number) {
+       this.zones[zone].stop();
        this.turnOffMainsIfLastZone();
        console.log("Stopped " + this.zones[zone].name + ".");
        this.blynk.notify("Stopped " + this.zones[zone].name + ".");

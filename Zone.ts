@@ -40,14 +40,14 @@ export class Zone {
     }
  
     start() {
+       console.log("Start: Writing to pin: " + this.pin);
        this.blynk.virtualWrite(this.pin, 255); //turn on the blnyk led
        this.isOn = true;      
        this.gpio.writeSync(0);
     }
  
     stop() {
-
-      console.log("Writing to pin: " + this.pin + " for " + this.name);
+      console.log("Stop: Writing to pin: " + this.pin);
        this.gpio.writeSync(1);
        //Turn off the blynk leds
        this.blynk.virtualWrite(this.pin, 0); 
