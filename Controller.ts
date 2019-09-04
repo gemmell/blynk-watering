@@ -66,10 +66,37 @@ export class Controller {
             this.mains.start();
             await sleep(1000);
             this.zones[zone].start();
-            let timeInMilliSeconds = timeInMinutes * 60 * 1000;
-            setTimeout(() => {
+            if (this.zones[zone].pulseWater && timeInMinutes > 30) {
+                let timeInMilliSeconds = timeInMinutes * 60 * 1000;
+                const tenths = Math.floor(timeInMilliSeconds / 10);
+                // On for one tenth of the time (1)
+                await sleep(tenths);
+                 // Off for one tenth (2)
+                this.mains.stop();
+                await sleep(1000);
+                this.zones[zone].stop();
+                await sleep(tenths);
+                // On for two tenths (4)
+                this.mains.start();
+                await sleep(1000);
+                this.zones[zone].start();
+                await sleep(tenths*2);
+                // Off for a tenth (5)
+                this.mains.stop();
+                await sleep(1000);
+                this.zones[zone].stop();
+                await sleep(tenths);
+                // On for 5 tenths (10)
+                this.mains.start();
+                await sleep(1000);
+                this.zones[zone].start();
+                await sleep(tenths*5);
                 this.stop(zone);
-            }, timeInMilliSeconds);
+            } else {
+                let timeInMilliSeconds = timeInMinutes * 60 * 1000;
+                await sleep(timeInMilliSeconds);
+                this.stop(zone);
+            }
             console.log("Started " + this.zones[zone].name + " for " + timeInMinutes + " minutes");
             this.blynk.notify("Started " + this.zones[zone].name + " for " + timeInMinutes + " minutes");
         })();
