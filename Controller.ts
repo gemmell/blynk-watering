@@ -14,6 +14,13 @@ export enum WateringSchedule {
     never
  };
 
+
+ function sleep(ms) {
+    return new Promise(resolve => {
+       setTimeout(resolve, ms)
+    })
+ }
+
 export class Controller {
     zones: Zone[];
     mains: Zone;
@@ -55,23 +62,29 @@ export class Controller {
     }
 
     start(zone: number, timeInMinutes: number) {
-        this.mains.start();
-        this.zones[zone].start();
-        let timeInMilliSeconds = timeInMinutes * 60 * 1000;
-        setTimeout(() => {
-           this.stop(zone);
-        }, timeInMilliSeconds);
-        console.log("Started " + this.zones[zone].name + " for " + timeInMinutes + " minutes");
-        this.blynk.notify("Started " + this.zones[zone].name + " for " + timeInMinutes + " minutes");      
-     }
+        (async () => {
+            this.mains.start();
+            await sleep(5000);
+            this.zones[zone].start();
+            let timeInMilliSeconds = timeInMinutes * 60 * 1000;
+            setTimeout(() => {
+                this.stop(zone);
+            }, timeInMilliSeconds);
+            console.log("Started " + this.zones[zone].name + " for " + timeInMinutes + " minutes");
+            this.blynk.notify("Started " + this.zones[zone].name + " for " + timeInMinutes + " minutes");
+        })();
+    }
 
-     stop(zone: number) {
-       this.zones[zone].stop();
-       this.turnOffMainsIfLastZone();
-       console.log("Stopped " + this.zones[zone].name + ".");
-       this.blynk.notify("Stopped " + this.zones[zone].name + ".");
-       this.setSchedule(zone, this.zones[zone].wateringSchedule);
-     }
+    stop(zone: number) {
+        (async () => {
+            await sleep(5000);
+            this.zones[zone].stop();
+            this.turnOffMainsIfLastZone();
+            console.log("Stopped " + this.zones[zone].name + ".");
+            this.blynk.notify("Stopped " + this.zones[zone].name + ".");
+            this.setSchedule(zone, this.zones[zone].wateringSchedule);
+        })();
+    }
 
     setSchedule(zone: number, desiredSchedule: WateringSchedule)
     {
