@@ -23,7 +23,7 @@ export class Zone {
        this.isOn = false;
        this.pulseWater = pulseWater;
        this.wateringSchedule = wateringSchedule;
-       this.ledPin.virtualWrite(0); //Turn off the led.
+       this.ledPin.write(0); //Turn off the led.
     }
  
     get toJson() {
