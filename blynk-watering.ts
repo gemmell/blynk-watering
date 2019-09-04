@@ -7,7 +7,7 @@ const blynk = new BlynkLib.Blynk(AUTH, {port: 443});
 const goButton = new blynk.VirtualPin(10);
 const timeInMinutesSlider = new blynk.VirtualPin(11);
 const zoneSelector = new blynk.VirtualPin(1);
-const scheduleWidget = new blynk.VirtualPin(6);
+const scheduleWidget = new blynk.VirtualPin(5);
 
 const controller: Controller = new Controller(blynk);
 
@@ -34,6 +34,7 @@ timeInMinutesSlider.on('write', function (param) {
 });
 
 scheduleWidget.on('write', function (param) {
+    console.log(param);
    const schd: WateringSchedule = param;
    controller.setSchedule(currentZoneIdx, schd);
 });
