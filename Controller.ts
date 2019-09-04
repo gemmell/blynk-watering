@@ -64,7 +64,7 @@ export class Controller {
     start(zone: number, timeInMinutes: number) {
         (async () => {
             this.mains.start();
-            await sleep(5000);
+            await sleep(1000);
             this.zones[zone].start();
             let timeInMilliSeconds = timeInMinutes * 60 * 1000;
             setTimeout(() => {
@@ -77,8 +77,8 @@ export class Controller {
 
     stop(zone: number) {
         (async () => {
-            await sleep(5000);
             this.zones[zone].stop();
+            await sleep(1000);
             this.turnOffMainsIfLastZone();
             console.log("Stopped " + this.zones[zone].name + ".");
             this.blynk.notify("Stopped " + this.zones[zone].name + ".");
