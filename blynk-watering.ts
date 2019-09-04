@@ -2,7 +2,7 @@ import {Controller, WateringSchedule} from "./Controller"
 
 import * as BlynkLib from 'blynk-library'
 const AUTH = process.env.BLYNK_WATERING_KEY;
-const blynk = BlynkLib.Blynk(AUTH);
+const blynk = new BlynkLib.Blynk(AUTH);
 
 const goButton = new blynk.VirtualPin(10);
 const timeInMinutesSlider = new blynk.VirtualPin(11);
@@ -11,20 +11,20 @@ const scheduleWidget = new blynk.VirtualPin(6);
 
 const controller: Controller = new Controller(blynk);
 
-let currentZone = 1; 
+let currentZoneIdx = 0; 
 let customTimeInMinutes = 40;
 
 zoneSelector.on('write', function (param) {
   console.log(param[0]);
-  currentZone = Number(param);
-  console.log("Set to zone: " + controller.zones[currentZone].name);
+  currentZoneIdx = Number(param) - 1;
+  console.log("Set to zone: " + controller.zones[currentZoneIdx].name);
 });
 
 goButton.on('write', function (param) {
-   if ((param[0] == 1) && (controller.zones[currentZone].isOn === false)) {
-      controller.start(currentZone, customTimeInMinutes);
-   } else if (controller.zones[currentZone].isOn === true) {
-      controller.stop(currentZone);
+   if ((param[0] == 1) && (controller.zones[currentZoneIdx].isOn === false)) {
+      controller.start(currentZoneIdx, customTimeInMinutes);
+   } else if (controller.zones[currentZoneIdx].isOn === true) {
+      controller.stop(currentZoneIdx);
    }
 });
 
@@ -35,7 +35,7 @@ timeInMinutesSlider.on('write', function (param) {
 
 scheduleWidget.on('write', function (param) {
    const schd: WateringSchedule = param;
-   controller.setSchedule(currentZone, schd);
+   controller.setSchedule(currentZoneIdx, schd);
 });
 
 blynk.on('connect', function() {

@@ -86,7 +86,9 @@ export class Controller {
             case WateringSchedule.weekly:
                 scheduleString = "at " + startTime + "am every Mon of the year"; break;
             default:
-                this.zones[zone].nextOccurence.clear();
+                if (this.zones[zone].nextOccurence) {
+                    this.zones[zone].nextOccurence.clear();
+                }
                 console.log(this.zones[zone].name + " is never going to water...");
         };
         this.setScheduleWithText(zone, scheduleString);
