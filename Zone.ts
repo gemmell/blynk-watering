@@ -40,7 +40,7 @@ export class Zone {
     }
  
     start() {
-       this.ledPin.virtualWrite(255); //turn on the blynk led
+       this.ledPin.write(255); //turn on the blynk led
        this.isOn = true;      
        this.gpio.writeSync(0);
     }
@@ -48,7 +48,7 @@ export class Zone {
     stop() {
        this.gpio.writeSync(1);
        //Turn off the blynk leds
-       this.ledPin.virtualWrite(0);
+       this.ledPin.write(0);
        this.isOn = false;
     }
  }
