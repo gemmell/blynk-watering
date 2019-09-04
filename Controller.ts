@@ -78,13 +78,13 @@ export class Controller {
         let scheduleString: string = "";
         switch (desiredSchedule) {
             case WateringSchedule.everySecondDay:
-                scheduleString = "at " + startTime + "am every 2nd day of the year"; break;
+                scheduleString = "at " + startTime + ":00 am every 2nd day"; break;
             case WateringSchedule.everyThirdDay:
-                scheduleString = "at " + startTime + "am every 3rd day of the year"; break;
+                scheduleString = "at " + startTime + ":00 am every 3rd day"; break;
             case WateringSchedule.daily:
-                scheduleString = "at " + startTime + "am every day of the year"; break;
+                scheduleString = "at " + startTime + ":00 am"; break;
             case WateringSchedule.weekly:
-                scheduleString = "at " + startTime + "am every Mon of the year"; break;
+                scheduleString = "at " + startTime + ":00 am on Mon"; break;
             default:
                 scheduleString = null;
         };
@@ -102,9 +102,10 @@ export class Controller {
             let startFn = () => {
                 this.start(60, zone);
             };
-            this.zones[zone].nextOccurence = later.setTimeout(startFn, s);
             let occurrences = later.schedule(s).next(1);
+            console.log(this.zones[zone].name + " next scheduled on " + occurrences + " for 60 minutes");
             this.blynk.notify(this.zones[zone].name + " next scheduled on " + occurrences + " for 60 minutes");
+            this.zones[zone].nextOccurence = later.setInterval(startFn, s);
         }
 
     }
