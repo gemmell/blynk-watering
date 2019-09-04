@@ -33,9 +33,9 @@ timeInMinutesSlider.on('write', function (param) {
    console.log("Set time in minutes to:" + customTimeInMinutes);
 });
 
-scheduleWidget.on('write', function (param) {
-    console.log(param);
-   const schd: WateringSchedule = param;
+scheduleWidget.on('write', function (params) {
+   console.log(params[0]);
+   const schd: WateringSchedule = Number(params[0]);
    controller.setSchedule(currentZoneIdx, schd);
 });
 
