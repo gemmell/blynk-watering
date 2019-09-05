@@ -15,13 +15,13 @@ const controller: Controller = new Controller(blynk);
 let currentZoneIdx = 0; 
 let customTimeInMinutes = 40;
 
-(function () {
-   const originalLogFn = console.log;
-   console.log = function (str) {
-      originalLogFn(str);
-      terminalWidget.write(str);
-   }
-})();
+// (function () {
+//    const originalLogFn = console.log;
+//    console.log = function (str) {
+//       originalLogFn(str);
+//       terminalWidget.write(str);
+//    }
+// })();
 
 zoneSelector.on('write', function (param) {
   currentZoneIdx = Number(param) - 1;
