@@ -13,8 +13,8 @@ export class Zone {
     nextOccurence: later.Timer;
     blynk: any;
     cancelled: boolean = false; // Whether something has cancelled a watering session
-
-    constructor(blynk: any, name: string, pin: number, pulseWater?: boolean, wateringSchedule?: WateringSchedule)
+    preferredDurationInMins: number = 60;
+    constructor(blynk: any, name: string, pin: number, pulseWater?: boolean, wateringSchedule?: WateringSchedule, preferredDurationInMins?: number)
     {
        this.blynk = blynk;
        this.name = name;
@@ -25,6 +25,9 @@ export class Zone {
        this.pulseWater = pulseWater;
        this.wateringSchedule = wateringSchedule;
        this.ledPin.write(0); //Turn off the led.
+       if (preferredDurationInMins) {
+         this.preferredDurationInMins = preferredDurationInMins;
+       }
     }
  
     get toJson() {

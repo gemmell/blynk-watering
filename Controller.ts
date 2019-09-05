@@ -36,7 +36,6 @@ export class Controller {
     zones: Zone[];
     mains: Zone;
     scheduleTimer: later.Timer;
-    cancelled: boolean;
     blynk: any;
     constructor(blynk: any) {
         this.blynk = blynk;
@@ -48,13 +47,12 @@ export class Controller {
             }
         } else {
             this.zones = [
-                new Zone(blynk, "veggies", 3, true),
-                new Zone(blynk, "side", 4, true),
-                new Zone(blynk, "grass", 17, false),
-                new Zone(blynk, "elm", 2, true)
+                new Zone(blynk, "veggies", 3, true, WateringSchedule.everySecondDay, 60),
+                new Zone(blynk, "side", 4, true, WateringSchedule.weekly, 60),
+                new Zone(blynk, "grass", 17, false, WateringSchedule.everyThirdDay, 60),
+                new Zone(blynk, "elm", 2, true, WateringSchedule.everyThirdDay, 60)
             ];
         }
-        this.cancelled = false;
     }
  
     turnOffMainsIfLastZone() {
@@ -103,7 +101,6 @@ export class Controller {
     }
 
     start(zone: number, timeInMinutes: number) {
-        this.zones[zone].cancelled = false;
         (async () => {
             if (this.zones[zone].pulseWater && timeInMinutes > 30) {
                 const aTenth = Math.floor(timeInMinutes / 10);
@@ -128,6 +125,9 @@ export class Controller {
             console.log("Stopped " + this.zones[zone].name + ".");
             this.blynk.notify("Stopped " + this.zones[zone].name + ".");
             this.setSchedule(zone, this.zones[zone].wateringSchedule);
+            // Because of all the stuff above, mostly the sleep 1000, we're just about assured
+            // that it won't have been cancelled. There's all sorts of rentrant issues here, but meh.
+            this.zones[zone].cancelled = false;
         })();
     }
 
@@ -164,11 +164,12 @@ export class Controller {
             console.log("Using schedule text: " + scheduleString);
             const s = later.parse.text(scheduleString);
             let startFn = () => {
-                this.start(60, zone);
+                this.start(this.zones[zone].preferredDurationInMins, zone);
             };
             let occurrences = later.schedule(s).next(1);
-            console.log(this.zones[zone].name + " next scheduled on " + occurrences + " for 60 minutes");
-            this.blynk.notify(this.zones[zone].name + " next scheduled on " + occurrences + " for 60 minutes");
+            const preferredDuration = this.zones[zone].preferredDurationInMins;
+            console.log(this.zones[zone].name + " next scheduled on " + occurrences + " for " + preferredDuration + " minutes");
+            this.blynk.notify(this.zones[zone].name + " next scheduled on " + occurrences + " for " + preferredDuration + " minutes");
             this.zones[zone].nextOccurence = later.setInterval(startFn, s);
         }
     }
