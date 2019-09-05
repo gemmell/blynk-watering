@@ -21,10 +21,22 @@ export enum WateringSchedule {
     })
  }
 
+ async function sleepUnlessCancelled(ms: number, cancelCheckFn: () => boolean) {
+     if (cancelCheckFn() === false) {
+         let total = 0;
+         while ((total < ms) && (cancelCheckFn() === false)) {
+             const sleepTime = Math.min(500, ms - total);
+             await sleep(sleepTime);
+             total += sleepTime;
+         }
+     }
+ }
+
 export class Controller {
     zones: Zone[];
     mains: Zone;
     scheduleTimer: later.Timer;
+    cancelled: boolean;
     blynk: any;
     constructor(blynk: any) {
         this.blynk = blynk;
@@ -42,6 +54,7 @@ export class Controller {
                 new Zone(blynk, "elm", 2, true)
             ];
         }
+        this.cancelled = false;
     }
  
     turnOffMainsIfLastZone() {
@@ -61,49 +74,54 @@ export class Controller {
         }
     }
 
-    start(zone: number, timeInMinutes: number) {
-        (async () => {
+    async doPulse(zone: number, timeInMinutesOn: number, timeInMinutesOff?: number)
+    {
+        const checkForCancelled = () => this.zones[zone].cancelled;
+
+        if (checkForCancelled() == false) {
+            console.log("Starting " + this.zones[zone].name + " for " + timeInMinutesOn + " minutes");
+            this.blynk.notify("Starting " + this.zones[zone].name + " for " + timeInMinutesOn + " minutes");
             this.mains.start();
-            await sleep(1000);
+            await sleepUnlessCancelled(500, checkForCancelled);
+        }
+        if (checkForCancelled() === false) {
             this.zones[zone].start();
-            if (this.zones[zone].pulseWater && timeInMinutes > 30) {
-                let timeInMilliSeconds = timeInMinutes * 60 * 1000;
-                const tenths = Math.floor(timeInMilliSeconds / 10);
-                // On for one tenth of the time (1)
-                await sleep(tenths);
-                 // Off for one tenth (2)
-                this.mains.stop();
-                await sleep(1000);
-                this.zones[zone].stop();
-                await sleep(tenths);
-                // On for two tenths (4)
-                this.mains.start();
-                await sleep(1000);
-                this.zones[zone].start();
-                await sleep(tenths*2);
-                // Off for a tenth (5)
-                this.mains.stop();
-                await sleep(1000);
-                this.zones[zone].stop();
-                await sleep(tenths);
-                // On for 5 tenths (10)
-                this.mains.start();
-                await sleep(1000);
-                this.zones[zone].start();
-                await sleep(tenths*5);
-                this.stop(zone);
-            } else {
-                let timeInMilliSeconds = timeInMinutes * 60 * 1000;
-                await sleep(timeInMilliSeconds);
-                this.stop(zone);
+            sleepUnlessCancelled(timeInMinutesOn * 60 * 1000, checkForCancelled);
+        }
+        if (checkForCancelled() === false) {
+            this.zones[zone].stop();
+            await sleepUnlessCancelled(500, checkForCancelled);
+            this.turnOffMainsIfLastZone();
+        }
+        if (checkForCancelled() === false) {
+            if (timeInMinutesOff) {
+                console.log(this.zones[zone].name + " stopped for pulse off time of " + timeInMinutesOff + " minutes");
+                this.blynk.notify(this.zones[zone].name + " stopped for pulse off time of " + timeInMinutesOff + " minutes");
+                await sleepUnlessCancelled(timeInMinutesOff * 60 * 1000, checkForCancelled);
             }
-            console.log("Started " + this.zones[zone].name + " for " + timeInMinutes + " minutes");
-            this.blynk.notify("Started " + this.zones[zone].name + " for " + timeInMinutes + " minutes");
+        }
+    }
+
+    start(zone: number, timeInMinutes: number) {
+        this.zones[zone].cancelled = false;
+        (async () => {
+            if (this.zones[zone].pulseWater && timeInMinutes > 30) {
+                const aTenth = Math.floor(timeInMinutes / 10);
+                // On for a tenth, off for a tenth (total now: 2)
+                await this.doPulse(zone, aTenth, aTenth);
+                // On for 2 tenths, off for a tenth (total now: 5)
+                await this.doPulse(zone, 2*aTenth, aTenth);
+                // On for 5 tenths (total now: 10)
+                await this.doPulse(zone, 5*aTenth);
+            } else {
+                await this.doPulse(zone, timeInMinutes);
+            }
         })();
     }
 
     stop(zone: number) {
         (async () => {
+            this.zones[zone].cancelled = true;
             this.zones[zone].stop();
             await sleep(1000);
             this.turnOffMainsIfLastZone();

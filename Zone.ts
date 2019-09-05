@@ -12,6 +12,7 @@ export class Zone {
     pulseWater: boolean;
     nextOccurence: later.Timer;
     blynk: any;
+    cancelled: boolean = false; // Whether something has cancelled a watering session
 
     constructor(blynk: any, name: string, pin: number, pulseWater?: boolean, wateringSchedule?: WateringSchedule)
     {
