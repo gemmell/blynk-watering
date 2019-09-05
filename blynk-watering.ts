@@ -8,11 +8,20 @@ const goButton = new blynk.VirtualPin(10);
 const timeInMinutesSlider = new blynk.VirtualPin(11);
 const zoneSelector = new blynk.VirtualPin(1);
 const scheduleWidget = new blynk.VirtualPin(5);
+const terminalWidget = new blynk.VirtualPin(9);
 
 const controller: Controller = new Controller(blynk);
 
 let currentZoneIdx = 0; 
 let customTimeInMinutes = 40;
+
+(function () {
+   const originalLogFn = console.log;
+   console.log = function (str) {
+      originalLogFn(str);
+      terminalWidget.write(str);
+   }
+})();
 
 zoneSelector.on('write', function (param) {
   currentZoneIdx = Number(param) - 1;
