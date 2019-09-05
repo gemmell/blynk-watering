@@ -74,7 +74,7 @@ export class Controller {
 
     async doPulse(zone: number, timeInMinutesOn: number, timeInMinutesOff?: number)
     {
-        const checkForCancelled = () => this.zones[zone].cancelled;
+        const checkForCancelled = () => { return this.zones[zone].cancelled; }
 
         if (checkForCancelled() == false) {
             console.log("Starting " + this.zones[zone].name + " for " + timeInMinutesOn + " minutes");
@@ -84,7 +84,7 @@ export class Controller {
         }
         if (checkForCancelled() === false) {
             this.zones[zone].start();
-            sleepUnlessCancelled(timeInMinutesOn * 60 * 1000, checkForCancelled);
+            await sleepUnlessCancelled(timeInMinutesOn * 60 * 1000, checkForCancelled);
         }
         if (checkForCancelled() === false) {
             this.zones[zone].stop();
