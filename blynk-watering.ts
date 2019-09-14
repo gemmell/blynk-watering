@@ -26,6 +26,8 @@ zoneSelector.on('write', function (param) {
   log("Set to zone: " + controller.zones[currentZoneIdx].name);
   // Sync our schedule with the UI
   scheduleWidget.write(controller.zones[currentZoneIdx].wateringSchedule);
+  // Write out when it's next scheduled to run
+  log(controller.zones[currentZoneIdx].nextOccurenceText);
 });
 
 goButton.on('write', function (param) {

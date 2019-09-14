@@ -10,6 +10,7 @@ export class Zone {
     isOn: boolean;
     wateringSchedule: WateringSchedule;
     pulseWater: boolean;
+    nextOccurenceText: string;
     nextOccurence: later.Timer;
     blynk: any;
     cancelled: boolean = false; // Whether something has cancelled a watering session

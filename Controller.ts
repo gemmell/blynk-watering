@@ -175,9 +175,11 @@ export class Controller {
             };
             let occurrences = later.schedule(s).next(1);
             const preferredDuration = this.zones[zone].preferredDurationInMins;
-            this.log(this.zones[zone].name + " next scheduled on " + occurrences + " for " + preferredDuration + " minutes");
-            this.blynk.notify(this.zones[zone].name + " next scheduled on " + occurrences + " for " + preferredDuration + " minutes");
+            this.zones[zone].nextOccurenceText = this.zones[zone].name + " next scheduled on " + occurrences + " for " + preferredDuration + " minutes";
+            this.log(this.zones[zone].nextOccurenceText);
             this.zones[zone].nextOccurence = later.setInterval(startFn, s);
+        } else {
+            this.zones[zone].nextOccurenceText = this.zones[zone].name + " does not have a recurring schedule.";
         }
     }
 }
