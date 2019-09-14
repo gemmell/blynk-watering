@@ -109,6 +109,7 @@ export class Controller {
 
     start(zone: number, timeInMinutes: number) {
         (async () => {
+            this.log("Starting " + this.zones[zone].name + " @ " + new Date());
             if (this.zones[zone].pulseWater && timeInMinutes > 30) {
                 const aTenth = Math.floor(timeInMinutes / 10);
                 // On for a tenth, off for a tenth (total now: 2)
@@ -168,7 +169,6 @@ export class Controller {
             thisZone.nextOccurence.clear();
         }
         if (scheduleString) {
-            this.log("Using schedule text: " + scheduleString);
             const s = later.parse.text(scheduleString);
             let startFn = () => {
                 this.start(this.zones[zone].preferredDurationInMins, zone);
