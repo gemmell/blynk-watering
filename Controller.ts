@@ -171,7 +171,7 @@ export class Controller {
         if (scheduleString) {
             const s = later.parse.text(scheduleString);
             let startFn = () => {
-                this.start(this.zones[zone].preferredDurationInMins, zone);
+                this.start(zone, this.zones[zone].preferredDurationInMins);
             };
             let occurrences = later.schedule(s).next(1);
             const preferredDuration = this.zones[zone].preferredDurationInMins;
