@@ -3,7 +3,6 @@ import * as later from 'later';
 later.date.localTime(); //tell later to use the local time.
 import * as BlynkLib from 'blynk-library'
 
-
 var fs = require('fs');
 
 export enum WateringSchedule {
@@ -37,8 +36,16 @@ export class Controller {
     mains: Zone;
     scheduleTimer: later.Timer;
     blynk: any;
-    constructor(blynk: any) {
+    terminal: any;
+
+    private log(text: string) {
+        this.terminal.write(text);
+        console.log(text);
+    }
+
+    constructor(blynk: any, terminal: any) {
         this.blynk = blynk;
+        this.terminal = terminal;
         this.mains = new Zone(blynk, "mains", 27);
         if (fs.existsSync('zones.json')) {
             let jsonZones = fs.readFileSync('zones.json');
@@ -57,16 +64,16 @@ export class Controller {
  
     turnOffMainsIfLastZone() {
         if (this.mains.isOn === true) {
-            console.log("Mains is on");
+            this.log("Mains is on");
             let allOff = true;
             for (let i = 0; i < this.zones.length; i++) {
                 if (this.zones[i].isOn === true) {
-                    console.log(this.zones[i].name + " is still on");
+                    this.log(this.zones[i].name + " is still on");
                     allOff = false;
                 }
             }
             if (allOff === true) {
-                console.log("Turning mains off");
+                this.log("Turning mains off");
                 this.mains.stop();
             }
         }
@@ -77,7 +84,7 @@ export class Controller {
         const checkForCancelled = () => { return this.zones[zone].cancelled; }
 
         if (checkForCancelled() == false) {
-            console.log("Starting " + this.zones[zone].name + " for " + timeInMinutesOn + " minutes");
+            this.log("Starting " + this.zones[zone].name + " for " + timeInMinutesOn + " minutes");
             this.blynk.notify("Starting " + this.zones[zone].name + " for " + timeInMinutesOn + " minutes");
             this.mains.start();
             await sleepUnlessCancelled(500, checkForCancelled);
@@ -93,7 +100,7 @@ export class Controller {
         }
         if (checkForCancelled() === false) {
             if (timeInMinutesOff) {
-                console.log(this.zones[zone].name + " stopped for pulse off time of " + timeInMinutesOff + " minutes");
+                this.log(this.zones[zone].name + " stopped for pulse off time of " + timeInMinutesOff + " minutes");
                 this.blynk.notify(this.zones[zone].name + " stopped for pulse off time of " + timeInMinutesOff + " minutes");
                 await sleepUnlessCancelled(timeInMinutesOff * 60 * 1000, checkForCancelled);
             }
@@ -122,7 +129,7 @@ export class Controller {
             this.zones[zone].stop();
             await sleep(1000);
             this.turnOffMainsIfLastZone();
-            console.log("Stopped " + this.zones[zone].name + ".");
+            this.log("Stopped " + this.zones[zone].name + ".");
             this.blynk.notify("Stopped " + this.zones[zone].name + ".");
             this.setSchedule(zone, this.zones[zone].wateringSchedule);
             // Because of all the stuff above, mostly the sleep 1000, we're just about assured
@@ -161,14 +168,14 @@ export class Controller {
             thisZone.nextOccurence.clear();
         }
         if (scheduleString) {
-            console.log("Using schedule text: " + scheduleString);
+            this.log("Using schedule text: " + scheduleString);
             const s = later.parse.text(scheduleString);
             let startFn = () => {
                 this.start(this.zones[zone].preferredDurationInMins, zone);
             };
             let occurrences = later.schedule(s).next(1);
             const preferredDuration = this.zones[zone].preferredDurationInMins;
-            console.log(this.zones[zone].name + " next scheduled on " + occurrences + " for " + preferredDuration + " minutes");
+            this.log(this.zones[zone].name + " next scheduled on " + occurrences + " for " + preferredDuration + " minutes");
             this.blynk.notify(this.zones[zone].name + " next scheduled on " + occurrences + " for " + preferredDuration + " minutes");
             this.zones[zone].nextOccurence = later.setInterval(startFn, s);
         }

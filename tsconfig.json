@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+      "target": "es2017",
+      "lib": ["es6", "es2015", "es2017.object"],
+      "moduleResolution": "node",
+      "allowJs": true,
+      "noImplicitAny": false,
+      "strictNullChecks": false,
+      "removeComments": true,
+      "noUnusedLocals": true,
+      "noUnusedParameters": true
+    },
+    "exclude": ["node_modules"],
+    "include": ["**/*.ts"]
+  }

@@ -10,39 +10,37 @@ const zoneSelector = new blynk.VirtualPin(1);
 const scheduleWidget = new blynk.VirtualPin(5);
 const terminalWidget = new blynk.VirtualPin(9);
 
-const controller: Controller = new Controller(blynk);
+const controller: Controller = new Controller(blynk, terminalWidget);
 
 let currentZoneIdx = 0; 
 let customTimeInMinutes = 40;
 
-// (function () {
-//    const originalLogFn = console.log;
-//    console.log = function (str) {
-//       originalLogFn(str);
-//       terminalWidget.write(str);
-//    }
-// })();
+function log(text: string)
+{
+   terminalWidget.write(text);
+   console.log(text);
+}
 
 zoneSelector.on('write', function (param) {
   currentZoneIdx = Number(param) - 1;
-  console.log("Set to zone: " + controller.zones[currentZoneIdx].name);
+  log("Set to zone: " + controller.zones[currentZoneIdx].name);
   // Sync our schedule with the UI
   scheduleWidget.write(controller.zones[currentZoneIdx].wateringSchedule);
 });
 
 goButton.on('write', function (param) {
    if ((param[0] == 1) && (controller.zones[currentZoneIdx].isOn === false)) {
-      console.log("Write: Turning on " + controller.zones[currentZoneIdx].name);
+      log("Write: Turning on " + controller.zones[currentZoneIdx].name);
       controller.start(currentZoneIdx, customTimeInMinutes);
    } else if (controller.zones[currentZoneIdx].isOn === true) {
-      console.log("Write: Turning off " + controller.zones[currentZoneIdx].name);
+      log("Write: Turning off " + controller.zones[currentZoneIdx].name);
       controller.stop(currentZoneIdx);
    }
 });
 
 timeInMinutesSlider.on('write', function (param) {
    customTimeInMinutes = Number(param[0]);
-   console.log("Set time in minutes to:" + customTimeInMinutes);
+   log("Set time in minutes to:" + customTimeInMinutes);
 });
 
 scheduleWidget.on('write', function (params) {
@@ -52,7 +50,7 @@ scheduleWidget.on('write', function (params) {
 
 blynk.on('connect', function() {
    blynk.syncAll(); 
-   console.log("Blynk ready."); 
+   log("Blynk ready."); 
 });
 
-blynk.on('disconnect', function() { console.log("DISCONNECT"); });
+blynk.on('disconnect', function() { log("DISCONNECT"); });
