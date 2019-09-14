@@ -49,6 +49,7 @@ scheduleWidget.on('write', function (params) {
 });
 
 blynk.on('connect', function() {
+   log("Connected at " + new Date());
    blynk.syncAll(); 
    log("Blynk ready."); 
 });
