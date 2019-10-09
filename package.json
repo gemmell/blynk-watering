@@ -10,10 +10,10 @@
   "license": "GPL",
   "dependencies": {
     "@types/later": "^1.2.5",
-    "@types/node": "^12.7.3",
-    "blynk-library": "^0.4.7",
+    "@types/node": "^12.7.12",
+    "blynk-library": "^0.5.4",
     "dotenv": "^4.0.0",
     "later": "^1.2.0",
-    "onoff": "^4.1.0"
+    "onoff": "^4.1.4"
   }
 }
