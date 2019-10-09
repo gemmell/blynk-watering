@@ -52,8 +52,10 @@ scheduleWidget.on('write', function (params) {
 
 blynk.on('connect', function() {
    log("Connected at " + new Date());
-   blynk.syncAll(); 
-   log("Blynk ready."); 
+   setTimeout(() => {
+      blynk.syncAll(); 
+      log("Blynk ready."); 
+   }, 2000);
 });
 
 blynk.on('disconnect', function() { log("DISCONNECT"); });
