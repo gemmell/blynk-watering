@@ -121,6 +121,8 @@ export class Controller {
             } else {
                 await this.doPulse(zone, timeInMinutes);
             }
+            // Finished, make sure we set up the next schedule
+            this.setSchedule(zone, this.zones[zone].wateringSchedule);
         })();
     }
 
